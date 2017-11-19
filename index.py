@@ -10,8 +10,7 @@ import git
 TOKEN = os.environ.get("GITHUB_TOKEN")
 source = git.Repo.clone_from('https://' + TOKEN + '@github.com/Skarlso/blogsource.git', os.path.join(os.getcwd(), 'blog'))
 
-with open(os.path.join(os.getcwd(), 'blog', 'temp.file'), 'w') as temp_file:
-    temp_file.write('test')
+# Pull S3 artifact here and apply it to blog folder
 
 source.git.add(A=True)
 source.index.commit('Added new content.')
