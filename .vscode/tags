@@ -349,6 +349,7 @@ RootModule	../git/repo/base.py	/^from git.objects import Submodule, RootModule, 
 RootModule	../git/test/test_submodule.py	/^from git.objects.submodule.root import RootModule, RootUpdateProgress$/;"	kind:namespace	line:19
 RootUpdateProgress	../git/objects/submodule/root.py	/^class RootUpdateProgress(UpdateProgress):$/;"	kind:class	line:19
 RootUpdateProgress	../git/test/test_submodule.py	/^from git.objects.submodule.root import RootModule, RootUpdateProgress$/;"	kind:namespace	line:19
+S3_CLIENT	../index.py	/^S3_CLIENT = boto3.client('s3')$/;"	kind:variable	line:12
 STAGE_MASK	../git/util.py	/^    STAGE_MASK = BEGIN | END$/;"	kind:variable	line:366
 S_IFDIR	../git/test/test_fun.py	/^from stat import S_IFDIR, S_IFREG, S_IFLNK$/;"	kind:namespace	line:2
 S_IFGITLINK	../git/index/base.py	/^    S_IFGITLINK = S_IFGITLINK  # a submodule$/;"	kind:variable	line:100
@@ -391,7 +392,7 @@ SymbolicReference	../git/refs/reference.py	/^from .symbolic import SymbolicRefer
 SymbolicReference	../git/refs/symbolic.py	/^class SymbolicReference(object):$/;"	kind:class	line:37
 SymbolicReference	../git/repo/fun.py	/^from git.refs import SymbolicReference$/;"	kind:namespace	line:9
 TExc	../git/test/test_exc.py	/^class TExc(TestBase):$/;"	kind:class	line:52
-TOKEN	../index.py	/^TOKEN = os.environ.get("GITHUB_TOKEN")$/;"	kind:variable	line:10
+TOKEN	../index.py	/^TOKEN = os.environ.get("GITHUB_TOKEN")$/;"	kind:variable	line:11
 TOKEN_SEPARATOR	../git/util.py	/^    TOKEN_SEPARATOR = ', '$/;"	kind:variable	line:370
 TYPES	../git/objects/base.py	/^    TYPES = (dbtyp.str_blob_type, dbtyp.str_tree_type, dbtyp.str_commit_type, dbtyp.str_tag_type)$/;"	kind:variable	line:25
 Tag	../git/refs/tag.py	/^Tag = TagReference$/;"	kind:variable	line:93
@@ -1198,6 +1199,7 @@ blob	../git/objects/util.py	/^        from . import blob$/;"	kind:namespace	line
 blob.py	../git/objects/blob.py	1;"	kind:file	line:1
 blob_id	../git/objects/tree.py	/^    blob_id = 0o10$/;"	kind:variable	line:174
 blobs	../git/objects/tree.py	/^    def blobs(self):$/;"	kind:member	line:261
+boto3	../index.py	/^import boto3$/;"	kind:namespace	line:8
 branch	../git/objects/submodule/base.py	/^    def branch(self):$/;"	kind:member	line:1094
 branch_name	../git/objects/submodule/base.py	/^    def branch_name(self):$/;"	kind:member	line:1107
 branch_path	../git/objects/submodule/base.py	/^    def branch_path(self):$/;"	kind:member	line:1100
@@ -1392,7 +1394,6 @@ digits	../git/repo/fun.py	/^from string import digits$/;"	kind:namespace	line:4
 dirname	../gitdb/util.py	/^dirname = os.path.dirname$/;"	kind:variable	line:62
 dst	../git/objects/util.py	/^    def dst(self, dt):$/;"	kind:member	line:114
 emit	../git/util.py	/^    def emit(self, record):$/;"	kind:member	line:955
-empty_repo	../index.py	/^empty_repo = git.Repo.init(osp.join(rw_dir, 'empty'))$/;"	kind:variable	line:17
 encodefilename	../git/compat.py	/^def encodefilename(fn):$/;"	kind:function	line:246
 encoding.py	../gitdb/utils/encoding.py	1;"	kind:file	line:1
 end_access	../smmap/buf.py	/^    def end_access(self):$/;"	kind:member	line:151
@@ -1540,6 +1541,7 @@ handle_process_output	../git/remote.py	/^from git.cmd import handle_process_outp
 handle_process_output	../git/test/test_git.py	/^        from git.cmd import handle_process_output$/;"	kind:namespace	line:261
 handle_stderr	../git/index/base.py	/^        def handle_stderr(proc, iter_checked_out_files):$/;"	kind:function	line:1018
 handler	../git/util.py	/^        def handler(line):$/;"	kind:function	line:492
+handler	../index.py	/^def handler(event, context):$/;"	kind:function	line:14
 has_data	../gitdb/fun.py	/^    def has_data(self):$/;"	kind:member	line:143
 has_object	../gitdb/db/base.py	/^    def has_object(self, sha):$/;"	kind:member	line:196
 has_object	../gitdb/db/base.py	/^    def has_object(self, sha):$/;"	kind:member	line:34
@@ -1592,7 +1594,6 @@ info	../gitdb/pack.py	/^    def info(self, sha):$/;"	kind:member	line:767
 info_at_index	../gitdb/pack.py	/^    def info_at_index(self, index):$/;"	kind:member	line:783
 info_iter	../gitdb/pack.py	/^    def info_iter(self):$/;"	kind:member	line:859
 init	../git/repo/base.py	/^    def init(cls, path=None, mkdir=True, odbt=DefaultDBType, expand_vars=True, **kwargs):$/;"	kind:member	line:864
-init_repo	../index.py	/^def init_repo:$/;"	kind:function	line:12
 inode	../git/index/typ.py	/^    def inode(self):$/;"	kind:member	line:141
 inspect	../git/__init__.py	/^import inspect$/;"	kind:namespace	line:8
 inspect	../git/config.py	/^import inspect$/;"	kind:namespace	line:11
@@ -1825,7 +1826,6 @@ open	../gitdb/util.py	/^    def open(self, write=False, stream=False):$/;"	kind:
 optionxform	../git/config.py	/^    def optionxform(self, optionstr):$/;"	kind:member	line:270
 optvalueonly_source	../git/config.py	/^    optvalueonly_source = r'\\s*(?P<option>[^:=\\s][^:=]*)'$/;"	kind:variable	line:176
 orig_head	../git/refs/head.py	/^    def orig_head(self):$/;"	kind:member	line:30
-origin	../index.py	/^origin = empty_repo.create_remote('origin', repo.remotes.origin.url)$/;"	kind:variable	line:18
 os	../git/__init__.py	/^import os$/;"	kind:namespace	line:9
 os	../git/__init__.py	/^import os.path as osp$/;"	kind:namespace	line:12
 os	../git/cmd.py	/^import os$/;"	kind:namespace	line:10
@@ -1990,7 +1990,6 @@ prog	../git/test/test_submodule.py	/^prog = TestRootProgress()$/;"	kind:variable
 pull	../git/remote.py	/^    def pull(self, refspec=None, progress=None, **kwargs):$/;"	kind:member	line:784
 pump_stream	../git/cmd.py	/^    def pump_stream(cmdline, name, stream, is_decode, handler):$/;"	kind:function	line:82
 push	../git/remote.py	/^    def push(self, refspec=None, progress=None, **kwargs):$/;"	kind:member	line:803
-push_repo	../index.py	/^def push_repo:$/;"	kind:function	line:14
 py_where	../git/util.py	/^def py_where(program, path=None):$/;"	kind:function	line:199
 raise_exc	../git/index/base.py	/^        def raise_exc(e):$/;"	kind:function	line:367
 randint	../smmap/test/test_buf.py	/^from random import randint$/;"	kind:namespace	line:11
