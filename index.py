@@ -11,6 +11,7 @@ import boto3
 TOKEN = os.environ.get("GITHUB_TOKEN")
 S3_CLIENT = boto3.client('s3')
 BUCKET = os.environ.get("BUCKET")
+BLOG_PREFIX = 'public'
 
 def donwload_built_artifacts():
     """
@@ -19,13 +20,10 @@ def donwload_built_artifacts():
     s3_client = boto3.resource('s3')
 
     bucket = s3_client.Bucket(name=BUCKET)
-    for obj in bucket.objects.filter(Prefix='datamunger/'):
+    for obj in bucket.objects.filter(Prefix='%s/' % BLOG_PREFIX):
         print('{0}.{1}'.format(bucket.name, obj.key))
         path, _ = os.path.split(obj.key)
-        try:
-            os.makedirs(path)
-        except FileExistsError:
-            pass
+        os.makedirs(path, exist_ok=True)
         s3_client.meta.client.download_file(bucket.name, obj.key, obj.key)
 
 
@@ -46,7 +44,7 @@ def handler(event, context):
     git commit -a
     git push
     """
-    source = git.Repo.init(path=os.path.join(os.getcwd(), 'blog'))
+    source = git.Repo.init(path=os.path.join(os.getcwd(), BLOG_PREFIX))
     origin = source.create_remote('origin', 'https://%s@github.com/Skarlso/blogsource.git' % TOKEN)
     origin.fetch()
     source.head.reset(commit='origin/master')
