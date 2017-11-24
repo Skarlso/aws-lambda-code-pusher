@@ -33,14 +33,24 @@ def handler(event, context):
     """
     Lambda handler which gets called when a lambda executes.
     """
-    source = git.Repo.clone_from('https://' + TOKEN + '@github.com/Skarlso/blogsource.git', os.path.join(os.getcwd(), 'blog'))
 
     # Pull S3 artifact here and apply it to blog folder
-    bucket = S3_CLIENT.Bucket(name=BUCKET)
-    for obj in bucket.objects.filter(Prefix='public/'):
-        S3_CLIENT.download_file(bucket.name, obj.key, './blog/obj.key')
+    donwload_built_artifacts()
 
-    # response = S3_CLIENT.list_objects(Bucket=BUCKET, Prefix='public/', Delimiter='/')
+    """
+    git init
+    git remote add origin PATH/TO/REPO
+    git fetch
+    git reset origin/master
+    git checkout master
+    git commit -a
+    git push
+    """
+    source = git.Repo.init(path=os.path.join(os.getcwd(), 'blog'))
+    origin = source.create_remote('origin', 'https://%s@github.com/Skarlso/blogsource.git' % TOKEN)
+    origin.fetch()
+    source.head.reset(commit='origin/master')
+    source.heads.master.checkout()
     source.git.add(A=True)
     source.index.commit('Added new content.')
     source.git.push()
