@@ -30,7 +30,7 @@ def donwload_built_artifacts():
 
 def git_magic():
     source = git.Repo.init(path=os.path.join(os.getcwd(), BLOG_PREFIX))
-    origin = source.create_remote('origin', 'https://%s@github.com/Skarlso/blogsource.git' % TOKEN)
+    origin = source.create_remote('origin', 'https://%s@github.com/Skarlso/skarlso-github.io.git' % TOKEN)
     origin.fetch()
     source.head.reset(commit='origin/master')
     source.heads.master.set_tracking_branch(origin.refs.master)
