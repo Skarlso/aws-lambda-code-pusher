@@ -33,6 +33,7 @@ def git_magic():
     origin = source.create_remote('origin', 'https://%s@github.com/Skarlso/blogsource.git' % TOKEN)
     origin.fetch()
     source.head.reset(commit='origin/master')
+    source.heads.master.set_tracking_branch(origin.refs.master)
     source.heads.master.checkout()
     source.git.add(A=True)
     source.index.commit('Added new content.')
