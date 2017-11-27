@@ -7,13 +7,15 @@ import os
 import boto3
 import tarfile
 import sys
+from mutliprocessing import Pool
 
 # First create a Github instance:
 TOKEN = os.environ.get("GITHUB_TOKEN")
 S3_CLIENT = boto3.client('s3')
 BUCKET = os.environ.get("BUCKET")
-BLOG_PREFIX = '/tmp/public'
+BLOG_PREFIX = '/tmp'
 GIT_TAR = 'git-2.4.3.tar'
+S3_BUCKET = S3_CLIENT.Bucket(name=BUCKET)
 
 
 def install_git():
@@ -36,10 +38,10 @@ def install_git():
 
 
 def download_single_file(f):
-    print('{0}.{1}'.format(bucket.name, f))
+    print('{0}.{1}'.format(S3_BUCKET.name, f))
     path, filename = os.path.split(f)
     os.makedirs(name=path, exist_ok=True)
-    s3_client.meta.client.download_file(bucket.name, f, f)
+    S3_CLIENT.meta.client.download_file(S3_BUCKET.name, f, os.path.join(BLOG_PREFIX, f))
 
 
 def download_all_files(l):
@@ -53,7 +55,7 @@ def git_magic():
         print("%20s %s" % (param, os.environ[param]))
     import git
     print("Performing git magic.")
-    source = git.Repo.init(path=os.path.join(os.getcwd(), BLOG_PREFIX))
+    source = git.Repo.init(path='/tmp/public/blog/opt/app/public')
     print("Repo initated.")
     origin = source.create_remote('origin', 'https://%s@github.com/Skarlso/skarlso.github.io.git' % TOKEN)
     origin.fetch()
@@ -75,8 +77,7 @@ def handler(event, context):
     install_git()
 
     # Pull S3 artifact here and apply it to blog folder
-    bucket = s3_client.Bucket(name=BUCKET)
-    files = [obj.key for obj in bucket.objects.filter(Prefix='public/')]
+    files = [obj.key for obj in S3_BUCKET.objects.filter(Prefix='public/')]
     download_all_files(files)
 
     # Setup a Git repo and make a push with the changes.
