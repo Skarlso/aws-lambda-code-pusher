@@ -59,7 +59,7 @@ def git_magic():
     source.heads.master.set_tracking_branch(origin.refs.master)
     source.heads.master.checkout()
     source.git.add(A=True)
-    source.index.commit('Added new content.')
+    source.index.commit(message='Added new content through AWS Lambda.', author="Gergely Brautigam", committer='Gergely Brautigam')
     source.git.push()
     print("Push done.")
 
