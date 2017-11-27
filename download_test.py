@@ -1,12 +1,22 @@
 import os
 import boto3
+from multiprocessing import Pool
 
 s3_client = boto3.resource('s3')
 BUCKET = os.environ.get("BUCKET")
 
 bucket = s3_client.Bucket(name=BUCKET)
-for obj in bucket.objects.filter(Prefix='datamunger/'):
-    print('{0}.{1}'.format(bucket.name, obj.key))
-    path, filename = os.path.split(obj.key)
+
+
+def download_single_file(f):
+    print('{0}.{1}'.format(bucket.name, f))
+    path, filename = os.path.split(f)
     os.makedirs(name=path, exist_ok=True)
-    s3_client.meta.client.download_file(bucket.name, obj.key, obj.key)
+    s3_client.meta.client.download_file(bucket.name, f, f)
+
+def download_all_files():
+    pool = Pool(processes=5)
+    pool.map(download_single_file, bucket.objects.filter(Prefix='public/'))
+
+
+download_all_files()
