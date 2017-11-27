@@ -14,6 +14,7 @@ TOKEN = os.environ.get("GITHUB_TOKEN")
 BUCKET = os.environ.get("BUCKET")
 GIT_TAR = 'git-2.4.3.tar'
 BLOG_ARCHIVE = 'blog.zip'
+EMAIL = os.environ.get("AUTHOR_EMAIL")
 
 
 def install_git():
@@ -59,7 +60,10 @@ def git_magic():
     source.heads.master.set_tracking_branch(origin.refs.master)
     source.heads.master.checkout()
     source.git.add(A=True)
-    source.index.commit(message='Added new content through AWS Lambda.', author="Gergely Brautigam", committer='Gergely Brautigam')
+    from git import Actor
+    author = Actor("Gergely Brautigam", EMAIL)
+    committer = Actor("Gergely Brautigam", EMAIL)
+    source.index.commit(message='Added new content through AWS Lambda.', author=author, committer=committer)
     source.git.push()
     print("Push done.")
 
