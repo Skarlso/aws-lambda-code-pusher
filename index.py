@@ -35,7 +35,7 @@ def install_git():
 
 
 def download_blog_archive():
-    s3_client = boto3.client('s3')
+    s3_client = boto3.resource('s3')
     s3_client.meta.client.download_file(BUCKET, BLOG_ARCHIVE, '/tmp/blog.zip')
     assert os.path.isfile('/tmp/blog.zip')
     print('Blog zip successfully downloaded. Extracting now.')
