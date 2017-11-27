@@ -14,9 +14,13 @@ def download_single_file(f):
     os.makedirs(name=path, exist_ok=True)
     s3_client.meta.client.download_file(bucket.name, f, f)
 
-def download_all_files():
+
+def download_all_files(l):
     pool = Pool(processes=5)
-    pool.map(download_single_file, bucket.objects.filter(Prefix='public/'))
+    pool.map(download_single_file, l)
 
 
-download_all_files()
+files = [obj.key for obj in bucket.objects.filter(Prefix='public/')]
+
+download_all_files(files)
+

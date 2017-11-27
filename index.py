@@ -35,19 +35,16 @@ def install_git():
     print("Properties set. PATH is: %s." % sys.path)
 
 
-def download_built_artifacts():
-    """
-    Downloads the blog's built source from the bucket.
-    """
-    print("Downloading artifacts.")
-    s3_client = boto3.resource('s3')
+def download_single_file(f):
+    print('{0}.{1}'.format(bucket.name, f))
+    path, filename = os.path.split(f)
+    os.makedirs(name=path, exist_ok=True)
+    s3_client.meta.client.download_file(bucket.name, f, f)
 
-    bucket = s3_client.Bucket(name=BUCKET)
-    for obj in bucket.objects.filter(Prefix='%s/' % BLOG_PREFIX):
-        print('{0}.{1}'.format(bucket.name, obj.key))
-        path, _ = os.path.split(obj.key)
-        os.makedirs(name=path, exist_ok=True)
-        s3_client.meta.client.download_file(bucket.name, obj.key, obj.key)
+
+def download_all_files(l):
+    pool = Pool(processes=10)
+    pool.map(download_single_file, l)
 
 
 def git_magic():
@@ -78,7 +75,9 @@ def handler(event, context):
     install_git()
 
     # Pull S3 artifact here and apply it to blog folder
-    download_built_artifacts()
+    bucket = s3_client.Bucket(name=BUCKET)
+    files = [obj.key for obj in bucket.objects.filter(Prefix='public/')]
+    download_all_files(files)
 
     # Setup a Git repo and make a push with the changes.
     git_magic()
