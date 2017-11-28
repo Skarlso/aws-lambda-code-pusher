@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  GithubToken:
+    Description: The token to use to push to the git repository containing the blog
+    Default: Empty
+    Type: String
+  CodeBuildBucket:
+    Description: The CodeBuild deploy bucket.
+    Default: None
+    Type: String
+  LambdaBucket:
+    Description: The bucket from which the lambda function originates from
+    Default: None
+    Type: String
+  Email:
+    Description: The email to use as the committer
+    Default: None
+    Type: String
+  Name:
+    Description: The name to use as committer
+    Default: None
+    Type: String
+
+Resources:
+  Type: "AWS::CodeBuild::Project"
+  Properties:
+    Artifacts:
+      Artifacts
+    Description: CodeBuild project for the static website.
+    Environment:
+      ComputeType: BUILD_GENERAL1_SMALL
+      EnvironmentVariables:
+        - name: GITHUB_TOKEN
+        - value: 
+        - name: CODE_BUILD_BUCKET
+        - value:
+        - name: CODE_BUILD_BUCKET
+        - value:
+        - name: AUTHOR_EMAIL
+        - value: 
+        - name: AUTHOR_NAME
+        - value:
+    Name: String
+    ServiceRole: String
+    Source:
+      Source
+    Tags:
+      - Resource Tag
+    TimeoutInMinutes: Integer
