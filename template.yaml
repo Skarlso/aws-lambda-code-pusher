@@ -3,27 +3,32 @@ AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
   GithubToken:
     Description: The token to use to push to the git repository containing the blog.
-    Default: Empty
+    Type: String
+  CodeBuildRepository:
+    Description: The repository on which to watch for commits. Please use HTTPS.
     Type: String
   CodeBuildBucket:
-    Description: The CodeBuild deploy bucket.
-    Default: None
+    Description: The CodeBuild deploy bucket for the blog artifact.
     Type: String
-  LambdaURL:
-    Description: The url for the lambda function.
-    Default: None
+  LambdaBucket:
+    Description: The bucket for the lambda function.
     Type: String
   LambdaFunctionName:
     Description: The name of the lambda handler.
+    Default: gitPusher
+    Type: String
+  LambdaHandler:
+    Description: The name of the handler function.
     Default: index.handler
+    Type: String
+  LambdaRepository:
+    Description: The repository to push the built code too in the format 'user/blog.github.io.git'.
     Type: String
   CommitterEmail:
     Description: The email to use as the committer.
-    Default: None
     Type: String
   CommitterName:
     Description: The name to use as committer.
-    Default: None
     Type: String
 
 Resources:
@@ -43,7 +48,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
       Policies:
-      - PolicyName: LogRolePolicy
+      - PolicyName: CodeBuildAccessPolicy
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
@@ -59,29 +64,74 @@ Resources:
             - arn:aws:s3:::*
             - arn:aws:ssm:::*
 
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - s3.amazonaws.com
+            - logs.amazonaws.com
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: LambdaAccessPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:Create*
+            - logs:PutLogEvents
+            - s3:GetObject
+            - s3:ListBucket
+            Resource:
+            - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+            - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionName}:*'
+            - arn:aws:ssm:::*
 
-  Type: "AWS::CodeBuild::Project"
-  Properties:
-    Artifacts:
-      Artifacts
-    Description: CodeBuild project for the static website.
-    Environment:
-      ComputeType: BUILD_GENERAL1_SMALL
-      EnvironmentVariables:
-        - name: GITHUB_TOKEN
-        - value: !Ref GithubToken
-        - name: CODE_BUILD_BUCKET
-        - value: !Ref CodeBuildBucket
-        - name: LAMBDA_URL
-        - value: !Ref LambdaURL
-        - name: COMMITTER_NAME
-        - value: !Ref CommitterName
-        - name: COMMITTER_EMAIL
-        - value: !Ref CommitterEmail
-    Name: BobTheBuilder
-    ServiceRole: ARN -- This will be created above
-    Source:
-      Source
-    Tags:
-      - Resource Tag
-    TimeoutInMinutes: Integer
+  BlogBuilderProject:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Artifacts:
+        Location: !Ref CodeBuildBucket
+        Name: blog
+        Packaging: ZIP
+        Path: public
+        Type: S3
+      Description: CodeBuild project for the static website.
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Type: LINUX_CONTAINER
+        Image: aws/codebuild/golang:1.7.3
+      Name: BobTheBuilder
+      ServiceRole: !GetAtt [CodeBuildRole, Arn]
+      Source:
+        Type: GITHUB
+        Location: !Ref CodeBuildRepository
+        Auth: OAUTH
+
+  BlogPusherLambda:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        S3Bucket: !Ref LambdaBucket
+        S3Key: !Sub '${LambdaFunctionName}.zip'
+      Description: Pusher -- Is the lambda function which pushes the code to a specified repository.
+      Environment:
+        Variables:
+          - GITHUB_TOKEN: !Ref GithubToken
+          - REPO: !Sub 'https://${GithubToken}@github.com/${LambdaRepository}'
+          - COMMITTER_NAME: !Ref CommitterName
+          - COMMITTER_EMAIL: !Ref CommitterEmail
+          - BUCKET: !Ref CodeBuildBucket
+      FunctionName: !Ref LambdaFunctionName
+      Handler: !Ref LambdaHandler
+      Role: !GetAtt [LambdaRole, Arn]
+      Timeout: 180
+      Runtime: python3.6
