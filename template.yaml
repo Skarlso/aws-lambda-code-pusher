@@ -2,27 +2,64 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Parameters:
   GithubToken:
-    Description: The token to use to push to the git repository containing the blog
+    Description: The token to use to push to the git repository containing the blog.
     Default: Empty
     Type: String
   CodeBuildBucket:
     Description: The CodeBuild deploy bucket.
     Default: None
     Type: String
-  LambdaBucket:
-    Description: The bucket from which the lambda function originates from
+  LambdaURL:
+    Description: The url for the lambda function.
     Default: None
     Type: String
-  Email:
-    Description: The email to use as the committer
+  LambdaFunctionName:
+    Description: The name of the lambda handler.
+    Default: index.handler
+    Type: String
+  CommitterEmail:
+    Description: The email to use as the committer.
     Default: None
     Type: String
-  Name:
-    Description: The name to use as committer
+  CommitterName:
+    Description: The name to use as committer.
     Default: None
     Type: String
 
 Resources:
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - s3.amazonaws.com
+            - logs.amazonaws.com
+            - ssm.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: LogRolePolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:Create*
+            - logs:PutLogEvents
+            - s3:GetObject
+            - s3:PutObject
+            - ssm:GetParameters
+            Resource:
+            - arn:aws:logs:*:*:*
+            - arn:aws:s3:::*
+            - arn:aws:ssm:::*
+
+
   Type: "AWS::CodeBuild::Project"
   Properties:
     Artifacts:
@@ -32,17 +69,17 @@ Resources:
       ComputeType: BUILD_GENERAL1_SMALL
       EnvironmentVariables:
         - name: GITHUB_TOKEN
-        - value: 
+        - value: !Ref GithubToken
         - name: CODE_BUILD_BUCKET
-        - value:
-        - name: CODE_BUILD_BUCKET
-        - value:
-        - name: AUTHOR_EMAIL
-        - value: 
-        - name: AUTHOR_NAME
-        - value:
-    Name: String
-    ServiceRole: String
+        - value: !Ref CodeBuildBucket
+        - name: LAMBDA_URL
+        - value: !Ref LambdaURL
+        - name: COMMITTER_NAME
+        - value: !Ref CommitterName
+        - name: COMMITTER_EMAIL
+        - value: !Ref CommitterEmail
+    Name: BobTheBuilder
+    ServiceRole: ARN -- This will be created above
     Source:
       Source
     Tags:
