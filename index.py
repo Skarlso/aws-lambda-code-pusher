@@ -10,11 +10,13 @@ import sys
 import zipfile
 
 # First create a Github instance:
-TOKEN = os.environ.get("GITHUB_TOKEN")
 BUCKET = os.environ.get("BUCKET")
+REPO = os.environ.get("REPO")
 GIT_TAR = 'git-2.4.3.tar'
-BLOG_ARCHIVE = 'blog.zip'
-EMAIL = os.environ.get("AUTHOR_EMAIL")
+# BLOG_ARCHIVE = 'blog.zip'
+EMAIL = os.environ.get("COMMITTER_EMAIL")
+NAME = os.environ.get("COMMITTER_NAME")
+BLOG_ARCHIVE = os.environ.get("ARCHIVE") + '.zip'
 
 
 def install_git():
@@ -54,15 +56,15 @@ def git_magic():
     print("Performing git magic.")
     source = git.Repo.init(path='/tmp/public')
     print("Repo initated.")
-    origin = source.create_remote('origin', 'https://%s@github.com/Skarlso/skarlso.github.io.git' % TOKEN)
+    origin = source.create_remote('origin', REPO)
     origin.fetch()
     source.head.reset(commit='origin/master')
     source.heads.master.set_tracking_branch(origin.refs.master)
     source.heads.master.checkout()
     source.git.add(A=True)
     from git import Actor
-    author = Actor("Gergely Brautigam", EMAIL)
-    committer = Actor("Gergely Brautigam", EMAIL)
+    author = Actor(NAME, EMAIL)
+    committer = Actor(NAME, EMAIL)
     source.index.commit(message='Added new content through AWS Lambda.', author=author, committer=committer)
     source.git.push()
     print("Push done.")

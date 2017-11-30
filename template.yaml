@@ -125,11 +125,11 @@ Resources:
       Description: Pusher -- Is the lambda function which pushes the code to a specified repository.
       Environment:
         Variables:
-          GITHUB_TOKEN: !Ref GithubToken
           REPO: !Sub 'https://${GithubToken}@github.com/${LambdaRepository}'
           COMMITTER_NAME: !Ref CommitterName
           COMMITTER_EMAIL: !Ref CommitterEmail
           BUCKET: !Ref CodeBuildBucket
+          ARCHIVE: !Ref LambdaFunctionName
       FunctionName: !Ref LambdaFunctionName
       Handler: !Ref LambdaHandler
       Role: !GetAtt [LambdaRole, Arn]
