@@ -8,10 +8,10 @@ Parameters:
     Description: The repository on which to watch for commits. Please use HTTPS.
     Type: String
   CodeBuildBucket:
-    Description: The CodeBuild deploy bucket for the blog artifact.
+    Description: The CodeBuild deploy bucket for the blog artifact. This will be created.
     Type: String
   LambdaBucket:
-    Description: The bucket for the lambda function.
+    Description: The bucket for the lambda function. This has to exist.
     Type: String
   LambdaFunctionName:
     Description: The name of the lambda handler.
@@ -96,6 +96,21 @@ Resources:
             - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionName}:*'
             - arn:aws:ssm:::*
 
+  BuildBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref CodeBuildBucket
+      NotificationConfiguration:
+        LambdaConfiguration:
+          Event: s3:ObjectCreated:*
+          Filter:
+            S3Key:
+              Rules:
+                - Name: suffix
+                - Value: zip
+          Function: !GetAtt [BlogPusherLambda, Arn]
+
+  # TODO: tick: Build on each commit
   BlogBuilderProject:
     Type: "AWS::CodeBuild::Project"
     Properties:
@@ -118,7 +133,6 @@ Resources:
         Auth:
           Type: OAUTH
 
-  # TODO: Setup the trigger
   BlogPusherLambda:
     Type: "AWS::Lambda::Function"
     Properties:
