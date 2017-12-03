@@ -44,6 +44,7 @@ Resources:
             - s3.amazonaws.com
             - logs.amazonaws.com
             - ssm.amazonaws.com
+            - codebuild.amazonaws.com
           Action:
           - sts:AssumeRole
       Path: "/"
@@ -114,8 +115,10 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Ref CodeBuildRepository
-        Auth: OAUTH
+        Auth:
+          Type: OAUTH
 
+  # TODO: Setup the trigger
   BlogPusherLambda:
     Type: "AWS::Lambda::Function"
     Properties:
