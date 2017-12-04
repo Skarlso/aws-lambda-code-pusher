@@ -4,10 +4,10 @@ Main Github Pusher Code.
 Copyright 2017-infinity @Gergely Brautigam
 """
 import os
-import boto3
 import tarfile
 import sys
 import zipfile
+import boto3
 
 # First create a Github instance:
 BUCKET = os.environ.get("BUCKET")
@@ -20,24 +20,30 @@ BLOG_ARCHIVE = os.environ.get("ARCHIVE") + '.zip'
 
 
 def install_git():
+    """
+    Installs git to the targeted Lambda container.
+    """
     print("Installing Git.")
-    baseDir = '/tmp/git'
+    base_dir = '/tmp/git'
     with tarfile.open(GIT_TAR) as tar:
-        tar.extractall(path=baseDir)
+        tar.extractall(path=base_dir)
     print("Extracted git tar into /tmp/git. Directory content: ")
-    assert os.path.isdir(baseDir)
-    assert os.path.isdir(os.path.join(baseDir, 'usr/bin'))
+    assert os.path.isdir(base_dir)
+    assert os.path.isdir(os.path.join(base_dir, 'usr/bin'))
     print("Folder exists. Setting up environment properties.")
-    os.environ['GIT_TEMPLATE_DIR'] = os.path.join(baseDir, 'usr/share/git-core/templates')
-    os.environ['GIT_EXEC_PATH'] = os.path.join(baseDir, 'usr/libexec/git-core')
-    os.environ['LD_LIBRARY_PATH'] = os.path.join(baseDir, 'usr/lib64')
-    binDir = os.path.join(baseDir, 'usr/bin')
-    os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = os.path.join(binDir, 'git')
-    sys.path.append(binDir)
+    os.environ['GIT_TEMPLATE_DIR'] = os.path.join(base_dir, 'usr/share/git-core/templates')
+    os.environ['GIT_EXEC_PATH'] = os.path.join(base_dir, 'usr/libexec/git-core')
+    os.environ['LD_LIBRARY_PATH'] = os.path.join(base_dir, 'usr/lib64')
+    bin_dir = os.path.join(base_dir, 'usr/bin')
+    os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = os.path.join(bin_dir, 'git')
+    sys.path.append(bin_dir)
     print("Properties set. PATH is: %s." % sys.path)
 
 
 def download_blog_archive():
+    """
+    Download the created blog archive.
+    """
     s3_client = boto3.resource('s3')
     s3_client.meta.client.download_file(BUCKET, BLOG_ARCHIVE, '/tmp/blog.zip')
     assert os.path.isfile('/tmp/blog.zip')
@@ -49,6 +55,11 @@ def download_blog_archive():
 
 
 def git_magic():
+    """
+    This creates repository on the downloaded and extracted folder.
+    Once that's accomplished, it will push the changes to the repository.
+    Preserving the history of the branch.
+    """
     print("Before Git, PATH is: %s." % sys.path)
     for param in os.environ.keys():
         print("%20s %s" % (param, os.environ[param]))

@@ -110,7 +110,6 @@ Resources:
                 - Value: zip
           Function: !GetAtt [BlogPusherLambda, Arn]
 
-  # TODO: tick: Build on each commit
   BlogBuilderProject:
     Type: "AWS::CodeBuild::Project"
     Properties:
